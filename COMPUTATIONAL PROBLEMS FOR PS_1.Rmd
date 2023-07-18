@@ -1,0 +1,182 @@
+---
+title: "Problem Set 1 - Computational Problems"
+author: "Ryan Denton"
+date: "10/14/21"
+output:
+  html_document: default
+  '': default
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+```{r}
+library(pacman)
+
+p_load(tidyverse)
+
+library(readxl)
+EC320_ps1 <- read_excel("EC320_ps1.xlsx")
+                     
+
+```
+
+
+
+
+Question #1
+
+```{r}
+
+
+EC320_ps1 <- EC320_ps1%>%
+  mutate(percent_trump_percounty = trump_votes/total_votes)
+
+
+
+EC320_ps1 <- EC320_ps1%>%
+  mutate(percent_biden_percounty = biden_votes/total_votes)
+
+
+EC320_ps1 <- EC320_ps1%>%
+  mutate(trump_margin_percounty = percent_trump_percounty- percent_biden_percounty)
+
+
+
+```
+
+
+
+
+Question #2
+
+```{r}
+                                      
+
+summary(EC320_ps1)  
+
+
+
+```
+
+
+
+
+
+Question 2a. 
+
+Trump's average/mean vote margin was 0.3200
+
+
+
+Question 2b.
+
+The meadian poverty rate was 13.40
+
+
+
+
+Question 2c
+
+169 people live in the least populous county
+
+10039107 people live in the most populous county
+
+
+
+
+
+
+
+#Question 3
+```{r}
+hist(EC320_ps1$trump_margin_percounty) 
+
+
+hist(EC320_ps1$population)
+
+```
+
+
+Even though trump had a higher margin of victory for a lot more counties, we can see that the counties are mostly small ones. And so even though trump won more counties, biden could still have more votes nationally by winning counties of larger sizes.
+
+
+
+
+
+Question 4
+
+```{r}
+
+
+
+
+ggplot(data = EC320_ps1, mapping = aes(x = poverty_rate, y = trump_margin_percounty))+
+  geom_point()          
+
+
+cor(EC320_ps1$poverty_rate, EC320_ps1$trump_margin_percounty)
+
+```
+
+
+
+The correlation coefficient here is -0.06355671. This means there is a VERY weak, if any, relationship between these two variables. This can also be seen visually, it just looks like a huge random assortment of dots without any linearity visible at all. So I would say that we couldn't conclude much from this graph.
+
+
+
+
+Question 5
+
+```{r}
+
+ggplot(data = EC320_ps1, mapping = aes(x = pct_bachelors_degree  , y = trump_margin_percounty))+
+  geom_point()          
+
+
+cor(EC320_ps1$pct_bachelors_degree, EC320_ps1$trump_margin_percounty)
+
+
+```
+
+
+Now in this one we can see there seems to be a negative relationship between these two variables. This is confirmed by the correlation coefficient value of -0.5301196. This means there is a moderate negative relationship, indicating that the data shows that as the number of individuals with bachelors degrees in a county goes up, trump's margin of victory goes down.
+
+
+
+
+
+Question 6
+
+```{r}
+
+state_data <- EC320_ps1 %>% 
+  group_by(state) %>% 
+  summarize(poverty = weighted.mean(x = poverty_rate, w = population),
+            bachelors_degree = weighted.mean(x = pct_bachelors_degree, w = population),
+            population = sum(population))
+
+```
+
+
+
+Question 7
+```{r}
+
+ggplot(data = state_data, mapping = aes(x = bachelors_degree  , y = poverty, size = population))+
+  geom_point()
+  
+
+cor(state_data$bachelors_degree, state_data$poverty)
+
+```
+
+
+I notice a negative correlation visually, which is confirmed when finding the correlation coefficient of -0.77. This indicates a strong negative relationship between these two variable. Which intuitively makes sense, the higher the number of people with bachelors degrees then the lower the poverty rate will be.Higher rates of higher educated people leads to higher levels of income in that state and therefore lower poverty rates.

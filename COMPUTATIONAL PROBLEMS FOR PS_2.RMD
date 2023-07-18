@@ -1,0 +1,158 @@
+---
+title: "Problem Set 2 - Computational Problems"
+author: "Ryan Denton"
+date: "10/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+
+
+```{r}
+library(tidyverse)
+
+library(broom)
+
+library(stargazer)
+
+EC320_ps2=read.csv("EC320_ps2.csv")
+
+```
+
+
+
+Question 1
+a. 
+
+kids_i= beta_0- beta_1(education_i) + u_i
+
+
+Question 1
+b.
+
+```{r}
+
+
+lm(kids ~ education, data=EC320_ps2)
+
+
+linearmod_education <- lm(EC320_ps2$kids ~ EC320_ps2$education)
+
+linearmod_education
+
+```
+
+Question 1
+c.
+
+Each way to do it:
+
+```{r}
+
+summary(linearmod_education)
+
+tidy(linearmod_education)
+
+stargazer(linearmod_education, keep.stat = c("rsq","n"), type="text")
+
+
+```
+
+
+Question 1
+d.
+
+```{r}
+ggplot(data = EC320_ps2 , aes(x = education , y = kids)) + geom_point() + stat_smooth(method ="lm", se =FALSE)
+
+
+
+```
+
+Question 1
+e.
+
+The intercept of 1.703 tells us that if a woman has zero years of education we would expect, from our model, that she would have between 1 to 2 kids, more often 2 since the intercept is closer to that number than it is to 1.
+
+
+Question 1
+f.
+
+The slope of -0.009 tells us that, on average, each additional year of education would reduce the amount of kids a woman has by 0.009, Note this is an odd value given the context of the question.
+
+
+Question 1
+g.
+
+This slope estimate does not describe any causal effect of education on fertility. This slope is such a low number it is close to being zero and therefore a flat line, as seen in our illustration above. In my opinion this model does not allow us to derive any insight at all as to any causal relationship if there exists one. Our coefficient of determination here is 0.0002 which means virtually no variance in the amount of kids a woman has can be explained by the years of education completed using this model.
+
+
+Potential selection bias and omitted variable:
+
+Depending on how the interview process for this data was conducted, selection bias could be the fact that woman who are obtaining higher educations or woman with more kids may not be represented because they are too busy for interviews.
+
+
+Omitted variables could be the parents education level and whether they have been present in the woman's life as she grew up because these two things could effect both the level of education reached as well as the number of kids a woman has.
+
+
+If the woman was is a relationship or not is data that is not present in this set. This could influence the number of kids she has because, for example, if she is in a relationship with someone with a high income then the opportunity cost of a kid isn't as high as one of the theories suggests it might be. 
+
+
+The age of the woman could be an omitted variable that effects both the level of education she might have obtained as well as how many children she has.
+
+
+Level of intelligence and underlying ability can effect whether the woman can even obtain higher levels of education and may influence the number of kids she has.
+
+
+Family history of fertility, the woman's genetics and child-bearing ability could all be influencing the data.
+
+
+This is 1975 data when woman were still marginalized and not as present in the workforce as they are today. Those that were in the workplace weren't getting promoted to higher positions and had way lower wages than men due to discrimination and therefore the opportunity cost of having a kid wasn't as high as one of the theories suggests. Woman in this time were very much still put into a certain role in society, that of a housewife that has kids. This social culture could effect both the level of education reached as well as the number of kids she had.
+
+
+
+
+
+Question 2
+a.
+
+kids_i = beta_0 + beta_1 (meducation_i) + U_i
+
+kids_i = beta_0 + beta_1 (feducation_i) + U_i
+
+
+Question 2
+b.
+
+```{r}
+
+linearmod_education <- lm(EC320_ps2$kids ~ EC320_ps2$education)
+
+stargazer(linearmod_education, keep.stat = c("rsq","n"), type="text")
+
+
+linearmod_Meducation <- lm(EC320_ps2$kids ~ EC320_ps2$meducation)
+
+stargazer(linearmod_Meducation, keep.stat = c("rsq","n"), type="text")
+
+linearmod_Feducation <- lm(EC320_ps2$kids ~ EC320_ps2$feducation)
+
+stargazer(linearmod_education, linearmod_Meducation, linearmod_Feducation, keep.stat = c("rsq","n"), type="text")
+```
+
+
+Question 2
+c.
+
+In the table above we see that the coefficient of of determination from the regression of fertility on father's education is 0.0001. This tells us that virtually none of the variance in fertility can be explained by the father's education since this value is so low. So about 0.01% of the variance in in fertility is explained by the father's education in this model, which is not very helpful for us in deriving insight or attempting to determine any sort of relationship. 
+
+
+Question 2
+d.
+
+Of the three independent variables considered, it looks like the best predictor of fertility is the education of the woman's mother. This is because the coefficient of determination for this variable is the higher, being 0.005 or 0.5%. This is the higher level of variance that can explain the variance in fertility among the ones we have. Personally I wouldn't use any of these for any insights because all of the coefficient of determination values are so low. 

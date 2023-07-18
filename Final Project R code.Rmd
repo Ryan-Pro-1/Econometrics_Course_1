@@ -1,0 +1,155 @@
+---
+title: "Final Project"
+author: "Ryan Denton"
+date: "11/13/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+````{r}
+library(tidyverse)
+
+library(broom)
+
+library(stargazer)
+
+
+FPdata <-read.csv("X2222Data_on_homeless_population_and_foster_kids_count_for_2017_by_county.csv")
+
+```
+
+```{r}
+
+colnames(FPdata)[8] <- "perc_foster"
+
+colnames(FPdata)[11] <- "perc_homeless"
+
+colnames(FPdata)[12] <- "perc_unemployed"
+
+colnames(FPdata)[13] <- "perc_completed_College"
+
+##get variables together
+
+FPdata$perc_foster <- as.numeric(FPdata$perc_foster, na.rm=T)
+
+perc_foster <- FPdata$perc_foster
+
+perc_homeless <- FPdata$perc_homeless
+
+perc_unemployed <- FPdata$perc_unemployed
+
+perc_completed_College <- FPdata$perc_completed_College
+
+
+
+
+
+```
+
+
+
+
+```{r}
+
+##create the variables of the linear regression models
+
+reg1_fos_unemp <- lm(perc_foster ~perc_unemployed, data = FPdata)
+
+reg2_fos_unemp_home <- lm(perc_foster ~ perc_unemployed + perc_homeless, data = FPdata, na.rm=T)
+
+reg3_fos_unemp_home_college<- lm(perc_foster ~ perc_unemployed + perc_homeless + perc_completed_College, data = FPdata, na.rm=T)
+
+
+stargazer(reg1_fos_unemp, type ="text", na.rm=T)
+
+
+## Create a stargazer table of type "text" to get information of R-squared and parameter values
+stargazer(reg1_fos_unemp, reg2_fos_unemp_home, reg3_fos_unemp_home_college,keep.stat = c("rsq", "adj.rsq", "n"), type = "text", na.rm=T)
+
+
+## summaries
+
+summary(perc_foster)
+
+summary(perc_unemployed)
+
+summary(perc_homeless)
+
+summary(perc_completed_College)
+
+
+
+```
+
+
+```{r}
+
+ggplot(data = FPdata, aes(x = perc_unemployed, y = perc_foster))+ geom_point() + geom_smooth(method ="lm")
+
+
+
+
+
+
+
+plot(FPdata$perc_foster ~ FPdata$perc_homeless+FPdata$perc_completed_College+ FPdata$perc_unemployed)
+
+
+```
+
+
+
+
+Let's do a hypothesis test at a 1% level of significance on unemployment rate.
+
+The true model is:
+$$FosterKids_i = \beta_0 + \beta_1 UnemploymentRate_i + \beta_2Homeless_i + \beta_3CollegeDegree_i  + u_i$$
+
+And so our fitted model would be:
+
+$$\hat{FosterKids}_i = \hat{\beta}_0 + \hat{\beta}_1 UnemploymentRate_i + \hat{\beta}_2Homeless_i + \hat{\beta}_3CollegeDegree_i$$
+
+
+The null hypothesis is:
+$$H_0\text{: } \beta_1 = 0$$
+The alternative hypothesis is:
+$$H_1\text{:}  \beta_1 \neq 0$$ 
+
+Lets look again at the p-value associated with the unemployment parameter
+```{r}
+stargazer(reg1_fos_unemp, type ="text", na.rm=T)
+
+```
+
+Which shows us that the p-value is less than 0.01, so we can reject the null hypothesis that beta_1 equals zero at the 1% level of significance.
+
+
+Next we can construct a 99% confidence interval:
+
+```{r}
+
+tidy(reg1_fos_unemp, conf.int = T, conf.level =0.99)
+```
+Therefore we get a 99% confidence interval of: [0.14197, 0.76971]. Telling us that 99% of the time the true slope parameter of the unemployment rate will fall in this range.
+
+
+
+As extra we can also create a 95% confidence interval:
+
+```{r}
+
+tidy(reg1_fos_unemp, conf.int = T, conf.level =0.95)
+```
+Therefore we get a 95% confidence interval of: [0.22275, 0.68894]. Telling us that 95% of the time the true slope parameter of the unemployment rate will fall in this range.
+
+

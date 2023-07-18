@@ -1,0 +1,90 @@
+---
+title: "Check problem set 1#4"
+author: "Ryan Denton"
+date: "10/14/21"
+output:
+  html_document: default
+  '': default
+---
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library("pacman")
+
+p_load(tidyverse)
+
+library(readxl)
+Excel_for_problem_set_1_4 <- read_excel("Excel_for_problem_set_1_4.xlsx")
+
+
+
+```
+
+```{r}
+library("pacman")
+p_load(tidyverse)
+
+
+ex <- Excel_for_problem_set_1_4    #dont wanna type this long name each time so create new data set with same info
+
+
+
+summary(ex)                       #summary of the data
+
+
+new_df <- ex%>%
+  select(Diameter, Volume)         #created another set with only the two interested variables
+  
+
+Diameter = ex$Diameter             
+
+Volume = ex$Volume
+
+
+
+
+
+
+mean(Diameter)                    #mean of diameter = 12.32
+
+mean(Volume)                      #mean of volume = 27.34
+
+
+
+
+
+var(Volume)                        #Variance of the volume = 313.953
+
+var(Diameter)                     #Variance of the diameter= 12.832
+
+cov(Volume,Diameter)                # sample covariance between diameter and volume = 62.324
+
+
+
+
+
+
+cor(Diameter,Volume)               # Finds the sample correlation coefficient between Diameter and volume(which agrees with my handwork on                                       onenote, which is 0.9819194) 
+
+
+
+
+plot(Volume ~ Diameter,            
+     col ="red",
+     pch=19)
+
+                                  #plot the data with Diameter on x-axis and volume on y-axis, change color of dots to red, and fill in                                       the dots
+
+
+
+              
+
+
+```

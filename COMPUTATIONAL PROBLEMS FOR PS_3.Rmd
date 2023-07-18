@@ -1,0 +1,144 @@
+---
+title: "Problem set 3 computational problems"
+author: "Ryan Denton"
+date: "11/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+````{r}
+library(tidyverse)
+
+library(broom)
+
+library(stargazer)
+
+
+EC320_ps3 <-read.csv("EC320_ps3.csv")
+
+```
+
+
+
+#1
+
+```{r}
+
+plot(EC320_ps3$medv~ EC320_ps3$rm)
+
+
+plot(EC320_ps3$medv~ EC320_ps3$age)
+
+plot(EC320_ps3$medv~ EC320_ps3$tax)
+
+
+```
+
+
+#2
+
+```{r}
+
+reg_medv_on_rm <- lm(EC320_ps3$medv ~ EC320_ps3$rm)
+
+stargazer(reg_medv_on_rm, type="text")
+
+
+```
+The coefficient 9.102 means that for each additional room added to the/a home, we would expect the median value of the house to increase by about $9,102 on average based on this data.
+
+
+
+#3
+
+```{r}
+
+reg_medv_on_rm_AND_age <- lm(EC320_ps3$medv ~ EC320_ps3$rm + EC320_ps3$age)
+
+
+stargazer(reg_medv_on_rm, reg_medv_on_rm_AND_age, type="text")
+
+```
+We can see that the estimated coefficient on "rm" goes down from 9.102 to 8.402 (so we were overestimating before the effect of rooms on house values before controlling for age). 
+
+Meaning we had OVB before due to the fact that the age of the house and the number of rooms are correlated. 
+   
+
+
+Lets plot out a regression line with rooms on the y axis and age on the horizontal, as well as use the "cor" function, to see the relationship:
+
+```{r}
+ggplot(data = EC320_ps3, aes(x =age, y = rm))+ geom_point() + geom_smooth(method ="lm")
+
+
+cor(EC320_ps3$rm, EC320_ps3$age)
+```
+
+The correlation coefficient between these two variable is -0.2402649, so there is a negative relationship. This is further confirmed by our regression line, we see that as the age of the house increases it tends to have less rooms in it. Therefore, the older the house is the less the value will be (by itself) but also the older the house is the less rooms it will tend to have, which in turn will also result in a lower house price as well, so it effects both the number of rooms as well as the value of the house. We can also check the OVB for the sign with the formula:
+$$ Bias = \beta_2 \frac{cov(X_1, X_2)}{var(X_1)} $$
+
+```{r}
+(-0.073)*cov(EC320_ps3$rm, EC320_ps3$age)/var(EC320_ps3$rm)
+```
+So there is a positive bias from omitting age.
+
+
+
+#4
+
+```{r}
+
+reg_medv_on_rm_AND_age_AND_tax <- lm(EC320_ps3$medv ~ EC320_ps3$rm + EC320_ps3$age + EC320_ps3$tax)
+
+
+stargazer(reg_medv_on_rm, reg_medv_on_rm_AND_age, reg_medv_on_rm_AND_age_AND_tax, type="text")
+
+
+```
+The R-squared in this regression is 0.570, which tells us that about 57% of the variance in housing prices (using this data) can be explained by these three variables. In other words, about 57% of the variation in housing prices can be explained by the number of rooms the house has, the age of the house, and the property tax rate per $10,000.
+
+
+
+#5 
+
+Note, I have already been using stargazer:) so this will look identical to what I did in #4.
+
+
+```{r}
+
+stargazer(reg_medv_on_rm, reg_medv_on_rm_AND_age, reg_medv_on_rm_AND_age_AND_tax, type="text")
+
+```
+
+Looking at the table we can see that the model with all three of the explanatory variables has the highest R-squared. These variables all effect the price of a house, and so of course the model with all three of them will be better at explaining the variation in housing prices than the other two models will be. Further, we know that adding explanatory variables (even if they are not relevant at all) mechanically increases the R-squared value, so adding more variables that do effect the dependent variable will of course increase the R-squared value. Also note that even the ADJUSTED R-squared value is increasing with each added explanatory variable.
+
+
+
+#6
+
+The null hypothesis is:
+$$H_0\text{: } \beta_2 = 0$$
+
+The alternative hypothesis is:
+$$H_1\text{:}  \beta_2 \neq 0$$ 
+```{r}
+
+tidy(reg_medv_on_rm_AND_age, conf.int = T, conf.level =0.99)
+
+
+```
+
+
+
+
+
+We can see that the 99% confidence interval is [-0.09937224,-0.04618133].
+
+
+
+Lastly, on a side note, since 0 does not fall within the lower and upper bounds that means we could reject the null at a 1% level of significance (which can be verified by the crazy low p-value).

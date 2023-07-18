@@ -1,0 +1,132 @@
+---
+title: "Problem Set 4 - Denton"
+author: "Ryan Denton"
+date: "11/27/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+library(tidyverse)
+
+library(broom)
+
+library(stargazer)
+
+library(pacman)
+
+
+
+
+```
+
+```{r}
+EC320_ps4 <-read.csv("EC320_ps4.csv")
+
+```
+
+
+
+a.
+
+```{r}
+
+
+EC320_ps4 <- EC320_ps4 %>%
+  mutate(k.RM.sum = EC320_ps4$readk + EC320_ps4$mathk,
+         G1.RM.sum = EC320_ps4$read1 + EC320_ps4$math1,
+         G2.RM.sum = EC320_ps4$read2 + EC320_ps4$math2,
+         G3.RM.sum = EC320_ps4$read3 + EC320_ps4$math3)
+
+
+summary(EC320_ps4$k.RM.sum)
+
+summary(EC320_ps4$G1.RM.sum)
+
+summary(EC320_ps4$G2.RM.sum)
+
+summary(EC320_ps4$G3.RM.sum)
+
+```
+
+
+b.
+
+
+
+$$k.RM.sum_i = \beta_0 + \beta_1 smallClass_i + \beta_2 regWithaide_i  + u_i$$
+
+$$G1.RM.sum_i = \beta_0 + \beta_1 smallClass_i + \beta_2 regWithaide_i  + u_i$$
+
+$$G2.RM.sum_i = \beta_0 + \beta_1 smallClass_i + \beta_2 regWithaide_i  + u_i$$
+
+$$G3.RM.sum_i = \beta_0 + \beta_1 smallClass_i + \beta_2 regWithaide_i  + u_i$$
+
+
+c.
+
+
+```{r}
+
+stargazer(lm( EC320_ps4$k.RM.sum ~ EC320_ps4$stark), type = "text")
+
+
+stargazer(lm( EC320_ps4$G1.RM.sum ~ EC320_ps4$star1), type = "text")
+
+
+stargazer(lm( EC320_ps4$G2.RM.sum ~ EC320_ps4$star2), type = "text")
+
+
+stargazer(lm( EC320_ps4$G3.RM.sum ~ EC320_ps4$star3), type = "text")
+
+
+```
+
+
+
+d.
+
+In each of the regression models above, the reference group is the students in the regular sized class for each grade level respectively.
+
+
+
+
+e.
+
+We would want to add more variables to this regression in order to reduce the standard error in our parameters as much as possible.
+
+
+
+f.
+
+Can add the following: education level of the teacher, experience level, school location, teacher's ethnicity, and whether the kid got free lunch of not.
+
+```{r}
+
+reg1 <- lm( EC320_ps4$k.RM.sum ~ EC320_ps4$stark)
+
+reg2 <- lm( EC320_ps4$k.RM.sum ~ EC320_ps4$stark + EC320_ps4$lunchk + EC320_ps4$schoolk + EC320_ps4$degreek + EC320_ps4$experiencek + EC320_ps4$tethnicityk)
+
+
+stargazer(reg1,reg2, type="text")
+
+
+```
+The standard error in both our treatment variables has decreased. The parameter associated with the regular class size with the aide has increased. The parameter associated with the small class size has decreased, but by only about 1 unit. 
+
+
+
+g.
+
+
+Yes, there does seem to be evidence supporting the claim that smaller class sizes increase students math and reading scores. We can see from the table that our findings are significant at the 1% level of significance. Further, even after adding all of those control variables, the estimated parameter value associated with smaller class sizes did not drop that much (only from about 14 to about 13, so about 1 unit). If this experiment was conducted using proper randomized trials, we could claim that this evidence supports a causal relationship (emphasis of "if"). 
